@@ -1,8 +1,11 @@
 const express = require('express');
+const { printTime, bodyParser } = require('./middleware.js');
 const app = express();
 const port = 3000;
 
-app.use(express.json());
+//Middleware
+app.use(printTime);
+app.use(bodyParser);
 
 var database = {places:[]};
 
