@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/pavelmp/rbk-live-server#readme",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "express": "^4.16.4"
   }
 }
