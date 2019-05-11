@@ -68,26 +68,21 @@ function completedWork(value){
     console.log(`I am done! I worked really hard for ${value} seconds`);
 };
 
-function doSomething(type, whenFinished){
-    let count = 0;
-    console.log(`I am ${type} hard`);
-    setTimeout(function(){
-        count += 1;
-        whenFinished(count)
-    }, 2000);
+function doSomething(type, seconds){
+    return new Bluebird(function(resolve, reject) {
+        let count = 0;
+        console.log(`I am ${type} hard`);
+        setTimeout(function(){
+            count += seconds;
+            resolve(count);
+        }, 1000 * seconds);
+    });
 };
 
-var doSomethingPromise = new Bluebird(function(resolve, reject) {
-    let count = 0;
-    setTimeout(function(){
-        count += 5;
-        resolve(count);
-    }, 2000);
-});
-
 app.get('/random', function(req, res){
-    doSomethingPromise.then(count => {
+    doSomething('coding', 5).then(count => {
         completedWork(count);
+        res.send('Done')
     })
 });
 
