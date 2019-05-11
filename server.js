@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { printTime, bodyParser } = require('./middleware.js');
+const { printTime, bodyParser, authenticate } = require('./middleware.js');
 const { SECRET_KEY } = require('./secret.js');
 const { HTTP_CREATED, HTTP_UNAUTHORIZED } = require('./constants.js');
 
@@ -11,26 +11,6 @@ const port = 3000;
 var database = {places:{"RBK": [{location: 'Mecca Mall'}], 
                         "RBK2": [{location: 'City Mall'}]}, 
                 users: {}};
-
-const authenticate = function(req, res, next){
-    const token = req.headers['x-access-token']; //Username encoded in token
-    if(!token){
-        return res.status(HTTP_UNAUTHORIZED).send('Please sign in');
-    }
-    jwt.verify(token, SECRET_KEY, function(err, decodedToken){
-        //If err, token invalid
-        if(err){
-            return res.status(HTTP_UNAUTHORIZED).send('Please sign in');
-        }
-        //Check if user exists in the database
-        const user = decodedToken.user;
-        if(database.users[user]){
-            req.body.user = user;
-            return next();
-        }
-    });
-    return res.status(HTTP_UNAUTHORIZED).send('Please sign in');
-};
 
 //Middleware
 app.use(printTime);
