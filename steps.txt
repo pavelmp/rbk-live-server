@@ -1,1 +1,25 @@
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiUkJLIiwiaWF0IjoxNTU3NTY5NDU3fQ.1Hp0ePEw6Te0U2Zwg49PD-CqTIZLNEdZd9VH4xyu65Q
+create github repo
+clone repo
+npm init
+install express
+create basic server
+use postman
+add nodemon
+improve API
+add .gitignore
+add database object
+add post API
+send data in plain text, look at req
+why use body-parser library, google "express request body"
+postman x-www-urlencoded, application/json requests
+change request type to JSON
+add middleware that prints time of every API request
+bcrypt (users object in database) (https://www.abeautifulsite.net/hashing-passwords-with-nodejs-and-bcrypt)
+http codes (https://www.restapitutorial.com/httpstatuscodes.html)
+install jwt (https://medium.freecodecamp.org/securing-node-js-restful-apis-with-json-web-tokens-9f811a92bb52)
+add token verification, set expiration (theory - https://jwt.io/introduction/, online token debugger - https://jwt.io/)
+asyncronous function - setTimeout example, startWork/finishWork example
+serving static files (with sendFile first, then with express.static)
+modular code
+
+adding react scripts to index.html, adding babel to package.json, creating App component
