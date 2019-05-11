@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Bluebird = require("bluebird");
 const { printTime, bodyParser, authenticate } = require('./middleware.js');
 const { SECRET_KEY } = require('./secret.js');
 const { HTTP_CREATED, HTTP_UNAUTHORIZED } = require('./constants.js');
@@ -61,6 +62,33 @@ app.post('/signin', function(req, res) {
             return res.status(HTTP_UNAUTHORIZED).send('Wrong password');
         }
     });
+});
+
+function completedWork(value){
+    console.log(`I am done! I worked really hard for ${value} seconds`);
+};
+
+function doSomething(type, whenFinished){
+    let count = 0;
+    console.log(`I am ${type} hard`);
+    setTimeout(function(){
+        count += 1;
+        whenFinished(count)
+    }, 2000);
+};
+
+var doSomethingPromise = new Bluebird(function(resolve, reject) {
+    let count = 0;
+    setTimeout(function(){
+        count += 5;
+        resolve(count);
+    }, 2000);
+});
+
+app.get('/random', function(req, res){
+    doSomethingPromise.then(count => {
+        completedWork(count);
+    })
 });
 
 app.listen(port, function() {
