@@ -20,6 +20,8 @@
     "bcrypt": "^3.0.6",
     "bluebird": "^3.5.4",
     "express": "^4.16.4",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.2.4",
+    "mongoose": "^5.5.7"
   }
 }

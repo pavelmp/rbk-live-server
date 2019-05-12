@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const Bluebird = require("bluebird");
 const { printTime, bodyParser, authenticate } = require('./middleware.js');
 const { SECRET_KEY } = require('./secret.js');
-const { HTTP_CREATED, HTTP_UNAUTHORIZED } = require('./constants.js');
-const database = require('./database/db');
+const { HTTP_CREATED, HTTP_UNAUTHORIZED, HTTP_BAD_REQUEST, HTTP_SERVER_ERROR } = require('./constants.js');
+const { Place, User } = require('./database/models');
 
 const app = express();
 const port = 3000;
@@ -36,8 +36,14 @@ app.post('/signup', function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
     const hashedPassword = bcrypt.hashSync(password, 10);
-    database.users[username] = hashedPassword;
-    return res.status(HTTP_CREATED).send('Sign up successful');
+    User.create({username: username, password: hashedPassword}).then(function(){
+        return res.status(HTTP_CREATED).send('Sign up successful');
+    }).catch(function(err){
+        if(err.code === 11000){
+            return res.status(HTTP_BAD_REQUEST).send('This username is already taken');
+        }
+        return res.status(HTTP_SERVER_ERROR).send('Server Error');
+    });
 });
 
 //Sign in user
@@ -45,20 +51,23 @@ app.post('/signin', function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
     //Check if user exists in the database
-    if(!database.users[username]){
-        return res.status(HTTP_UNAUTHORIZED).send('Please sign up');
-    }
-    //Compare with stored password
-    const existingPassword = database.users[username];
-    bcrypt.compare(password, existingPassword, function(err, isMatching){
-        if(isMatching){
-            //Create a token and send to client
-            const token = jwt.sign({user: username}, SECRET_KEY, {expiresIn: 4000});
-            return res.send({token: token});
-        } else {
-            return res.status(HTTP_UNAUTHORIZED).send('Wrong password');
+    User.findOne({username: username}).then(function(user){
+        if(!user){
+            return res.status(HTTP_UNAUTHORIZED).send('Please sign up'); 
         }
+        //Compare with stored password
+        const existingHashedPassword = user.password;
+        bcrypt.compare(password, existingHashedPassword).then(function(isMatching){
+            if(isMatching){
+                //Create a token and send to client
+                const token = jwt.sign({username: user.username}, SECRET_KEY, {expiresIn: 4000});
+                return res.send({token: token});
+            } else {
+                return res.status(HTTP_UNAUTHORIZED).send('Wrong password');
+            }
+        });
     });
+    
 });
 
 function completedWork(value){

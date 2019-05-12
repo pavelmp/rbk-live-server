@@ -1,8 +1,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { HTTP_UNAUTHORIZED } = require('./constants.js');
+const { HTTP_UNAUTHORIZED, HTTP_SERVER_ERROR } = require('./constants.js');
 const { SECRET_KEY } = require('./secret.js');
-const database = require('./database/db');
+const { User } = require('./database/models');
 
 const printTime = function(req, res, next){
     console.log(`Request ${req.method} received for ${req.url} at ${(new Date()).toLocaleTimeString()}`);
@@ -22,11 +22,17 @@ const authenticate = function(req, res, next){
             return res.status(HTTP_UNAUTHORIZED).send('Please sign in');
         }
         //Check if user exists in the database
-        const user = decodedToken.user;
-        if(database.users[user]){
+        const username = decodedToken.username;
+        User.findOne({username: username}).then(function(user){
+            console.log(user);
+            if(!user){
+                return res.status(HTTP_UNAUTHORIZED).send('Please sign up');
+            }
             req.body.user = user;
             return next();
-        }
+        }).catch(function(err){
+            return res.status(HTTP_SERVER_ERROR).send(err);
+        })
     });
 };
 
