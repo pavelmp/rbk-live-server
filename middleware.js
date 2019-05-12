@@ -1,4 +1,8 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const { HTTP_UNAUTHORIZED } = require('./constants.js');
+const { SECRET_KEY } = require('./secret.js');
+const database = require('./database/db');
 
 const printTime = function(req, res, next){
     console.log(`Request ${req.method} received for ${req.url} at ${(new Date()).toLocaleTimeString()}`);
@@ -24,7 +28,6 @@ const authenticate = function(req, res, next){
             return next();
         }
     });
-    res.status(HTTP_UNAUTHORIZED).send('Please sign in');
 };
 
 exports.printTime = printTime;

@@ -5,13 +5,10 @@ const Bluebird = require("bluebird");
 const { printTime, bodyParser, authenticate } = require('./middleware.js');
 const { SECRET_KEY } = require('./secret.js');
 const { HTTP_CREATED, HTTP_UNAUTHORIZED } = require('./constants.js');
+const database = require('./database/db');
 
 const app = express();
 const port = 3000;
-
-var database = {places:{"RBK": [{location: 'Mecca Mall'}], 
-                        "RBK2": [{location: 'City Mall'}]}, 
-                users: {}};
 
 //Middleware
 app.use(printTime);
@@ -56,7 +53,7 @@ app.post('/signin', function(req, res) {
     bcrypt.compare(password, existingPassword, function(err, isMatching){
         if(isMatching){
             //Create a token and send to client
-            const token = jwt.sign({user: username}, SECRET_KEY, {expiresIn: 10});
+            const token = jwt.sign({user: username}, SECRET_KEY, {expiresIn: 4000});
             return res.send({token: token});
         } else {
             return res.status(HTTP_UNAUTHORIZED).send('Wrong password');
@@ -74,15 +71,18 @@ function doSomething(type, seconds){
         console.log(`I am ${type} hard`);
         setTimeout(function(){
             count += seconds;
-            resolve(count);
+            reject(count);
         }, 1000 * seconds);
     });
 };
 
 app.get('/random', function(req, res){
-    doSomething('coding', 5).then(count => {
+    doSomething('coding', 3).then(count => {
         completedWork(count);
         res.send('Done')
+    }).catch(count =>{
+        completedWork(count);
+        res.send('Done in catch')
     })
 });
 
