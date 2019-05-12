@@ -28,7 +28,7 @@ const authenticate = function(req, res, next){
             if(!user){
                 return res.status(HTTP_UNAUTHORIZED).send('Please sign up');
             }
-            req.body.user = user;
+            req.body.user = user; //Put user in req.body
             return next();
         }).catch(function(err){
             return res.status(HTTP_SERVER_ERROR).send(err);

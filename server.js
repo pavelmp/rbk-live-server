@@ -2,10 +2,18 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Bluebird = require("bluebird");
+const mongoose = require('mongoose');
 const { printTime, bodyParser, authenticate } = require('./middleware.js');
-const { SECRET_KEY } = require('./secret.js');
+const { SECRET_KEY, DATABASE_URL } = require('./secret.js');
 const { HTTP_CREATED, HTTP_UNAUTHORIZED, HTTP_BAD_REQUEST, HTTP_SERVER_ERROR } = require('./constants.js');
-const { Place, User } = require('./database/models');
+const { Place, User } = require('./database/models.js');
+
+//Database connection
+mongoose.connect(DATABASE_URL).then(connection => {
+    console.log('Connected');
+}).catch(function(err){
+    console.log(err);
+});
 
 const app = express();
 const port = 3000;
@@ -20,15 +28,25 @@ app.get('/', function(req, res) {
 
 //Returns all places from the database
 app.get('/places', authenticate, function(req, res) {
-    const user = req.body.user;
-    return res.send(database.places[user]);
+    const user = req.body.user; //Added by authenticate function 
+    Place.find({user_id: user._id}).then(function(places){
+        return res.send(places);
+    }).catch(function(err){
+        return res.status(HTTP_SERVER_ERROR).send('Server Error');
+    })
 });
 
 //Add new place to the database
 app.post('/places', authenticate, function(req, res) {
-    const place = req.body;
-    database.places.push(place);
-    return res.send(place);
+    const place = {location: req.body.location, distance: req.body.distance};
+    const user = req.body.user;
+    Place.create({location: place.location, distance: place.distance, user_id: user._id})
+         .then(function(place){
+            return res.send({location: place.location});
+         })
+         .catch(function(err){
+            return res.status(HTTP_SERVER_ERROR).send(err.message);
+        })
 });
 
 //Create new user in the database
