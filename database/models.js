@@ -7,10 +7,6 @@ let placeSchema = new Schema({
     user_id: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
-// placeSchema.virtual('location_and_distance').get(function() {
-//     return `${this.location} (${this.distance})`;
-// })
-
 let userSchema = new Schema({
     username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
