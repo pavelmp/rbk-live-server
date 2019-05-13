@@ -22,4 +22,32 @@ asyncronous function - setTimeout example, startWork/finishWork example
 serving static files (with sendFile first, then with express.static)
 modular code
 
-adding react scripts to index.html, adding babel to package.json, creating App component
+Adding MongoDB:
+1) brew install mongodb
+2) brew services start mongodb
+3) Download Mongo GUI like Robo 3T
+4) Node mongodb setup without mongoose https://flaviocopes.com/node-mongodb/
+5) install mongoose
+
+(Optional) About asyncronous module exports
+https://stackoverflow.com/questions/20315434/node-js-asynchronous-module-loading
+
+6) Mongoose example: https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
+7) Mongoose example2: https://blog.cloudboost.io/everything-you-need-to-know-about-mongoose-63fcf8564d52
+
+8) Troubleshooting for .find not calling the callback
+https://stackoverflow.com/questions/16109788/why-mongodb-find-never-got-to-my-callback
+
+9) Difference between .exec((err, res)), .then(result), and callback inside
+
+10) Refactor by moving database methods into controller
+
+11) Set up mLab cluster and connect in Robo 3T
+
+12) Installing PostgresSQL https://blog.logrocket.com/setting-up-a-restful-api-with-node-js-and-postgresql-d96d6fc892d8
+
+13) Deployment
+Heroku login, CLI, heroku logs --tail, heroku restart, setting up ENV, modifying definition of PORT in the app, secret.js, whitelisting
+
+
+
