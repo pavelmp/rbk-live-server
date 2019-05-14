@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Bluebird = require("bluebird");
+const cors = require("cors");
 const mongoose = require('mongoose');
 const { printTime, bodyParser, authenticate } = require('./middleware.js');
 const { SECRET_KEY, DATABASE_URL } = require('./secret.js');
@@ -16,11 +17,12 @@ mongoose.connect(DATABASE_URL).then(connection => {
 });
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 //Middleware
 app.use(printTime);
 app.use(bodyParser);
+app.use(cors()); //Allow cross origin requests (browser security lecture)
 
 app.get('/', function(req, res) {
     res.send('Hello World!');
@@ -30,9 +32,9 @@ app.get('/', function(req, res) {
 app.get('/places', authenticate, function(req, res) {
     const user = req.body.user; //Added by authenticate function 
     Place.find({user_id: user._id}).then(function(places){
-        return res.send(places);
+        return res.send({places: places});
     }).catch(function(err){
-        return res.status(HTTP_SERVER_ERROR).send('Server Error');
+        return res.status(HTTP_SERVER_ERROR).send({error: 'Server Error'});
     })
 });
 
@@ -51,6 +53,7 @@ app.post('/places', authenticate, function(req, res) {
 
 //Create new user in the database
 app.post('/signup', function(req, res) {
+    console.log(req.body);
     const username = req.body.username;
     const password = req.body.password;
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -71,7 +74,7 @@ app.post('/signin', function(req, res) {
     //Check if user exists in the database
     User.findOne({username: username}).then(function(user){
         if(!user){
-            return res.status(HTTP_UNAUTHORIZED).send('Please sign up'); 
+            return res.status(HTTP_UNAUTHORIZED).send({error: 'Please sign up'}); 
         }
         //Compare with stored password
         const existingHashedPassword = user.password;
@@ -81,7 +84,7 @@ app.post('/signin', function(req, res) {
                 const token = jwt.sign({username: user.username}, SECRET_KEY, {expiresIn: 4000});
                 return res.send({token: token});
             } else {
-                return res.status(HTTP_UNAUTHORIZED).send('Wrong password');
+                return res.status(HTTP_UNAUTHORIZED).send({error: 'Wrong password'});
             }
         });
     });
